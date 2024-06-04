@@ -42,4 +42,3 @@ class Window:
         self.__running = False
 
 
-

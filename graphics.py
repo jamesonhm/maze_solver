@@ -17,11 +17,11 @@ class Line:
 
 
 class Window:
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, bg_color: str):
         self.__root = Tk()
         self.__root.title("Maze Solver")
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
-        self.__canvas = Canvas(self.__root, bg="green", width=width, height=height)
+        self.__canvas = Canvas(self.__root, bg=bg_color, width=width, height=height)
         self.__canvas.pack(fill=BOTH, expand=1)
         self.__running = False
 

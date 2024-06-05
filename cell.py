@@ -23,4 +23,19 @@ class Cell:
         if self.has_left:
             lline = Line(Point(self._top_l_pt.x, self._bot_r_pt.y), self._top_l_pt)
             self._win.draw_line(lline, "black")
+    
+    def draw_move(self, to_cell, undo: bool=False):
+        if undo:
+            lcolor = "gray"
+        else:
+            lcolor = "red"
+        self_center = self._center()
+        other_center = to_cell._center()
+        move = Line(self_center, other_center)
+        self._win.draw_line(move, lcolor)
+
+    def _center(self):
+        x = (self._top_l_pt.x + self._bot_r_pt.x) // 2
+        y = (self._top_l_pt.y + self._bot_r_pt.y) // 2
+        return Point(x, y)
 

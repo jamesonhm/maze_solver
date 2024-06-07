@@ -8,6 +8,10 @@ class Cell:
         self.has_left = True
         self._win = window
 
+    def __repr__(self):
+        # return f"Cell(t: {self.has_top}, r: {self.has_right}, b: {self.has_bottom}, l: {self.has_left})"
+        return f"Cell()"
+
     def draw(self, top_l_pt: Point, bot_r_pt: Point):
         self._top_l_pt = top_l_pt
         self._bot_r_pt = bot_r_pt

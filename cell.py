@@ -39,7 +39,7 @@ class Cell:
     
     def draw_move(self, to_cell, undo: bool=False):
         if undo:
-            lcolor = "gray"
+            lcolor = self._win.bg_color
         else:
             lcolor = "red"
         self_center = self._center()

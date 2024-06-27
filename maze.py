@@ -1,7 +1,7 @@
 import random
 import time
 
-from graphics import Point, Window
+from graphics import Line, Point, Window
 from cell import Cell
 
 class Maze:
@@ -55,7 +55,7 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        time.sleep(0.1)
+        time.sleep(0.01)
 
     def _break_entrance_and_exit(self):
         self._cells[0][0].has_top = False
@@ -109,8 +109,58 @@ class Maze:
             self._cells[c2[0]][c2[1]].has_right = False
             self._draw_cell(c2[0], c2[1])
 
+    def _cells_open(self, c1, c2):
+        if c2[1] > c1[1]:
+            # c2 below c1
+            if self._cells[c1[0]][c1[1]].has_bottom == False and self._cells[c2[0]][c2[1]].has_top == False:
+                return True
+            return False
+        elif c2[1] < c1[1]:
+            #c2 above c1
+            if self._cells[c1[0]][c1[1]].has_top == False and self._cells[c2[0]][c2[1]].has_bottom == False:
+                return True
+            return False
+        elif c2[0] > c1[0]:
+            # c2 right c1
+            if self._cells[c1[0]][c1[1]].has_right == False and self._cells[c2[0]][c2[1]].has_left == False:
+                return True
+            return False
+        elif c2[0] < c1[0]:
+            #c2 left c1
+            if self._cells[c1[0]][c1[1]].has_left == False and self._cells[c2[0]][c2[1]].has_right == False:
+                return True
+            return False
+
     def _reset_cells_visited(self):
         for col in self._cells:
             for cell in col:
                 cell.visited = False
+
+    def solve(self):
+        return self._solve_r(0, 0)
+
+    def _solve_r(self, i, j):
+        self._animate()
+        self._cells[i][j].visited = True
+        if i == self.ncols-1 and j == self.nrows-1:
+            return True
+        adjacent_cells = self._get_adjacent_cells(i, j)
+        for cell in adjacent_cells:
+            if self._cells_open((i, j), cell) and self._cells[cell[0]][cell[1]].visited == False:
+                # self._draw_move(self._cells[i][j], self._cells[cell[0]][cell[1]])
+                self._cells[i][j].draw_move(self._cells[cell[0]][cell[1]])
+                if self._solve_r(cell[0], cell[1]):
+                    return True
+                else:
+                    #self._draw_undo(self._cells[i][j], self._cells[cell[0]][cell[1]])
+                    self._cells[i][j].draw_move(self._cells[cell[0]][cell[1]], undo=True)
+        return False
+
+    def _draw_move(self, c1, c2):
+        move = Line(c1._center(), c2._center())
+        self._win.draw_line(move, "red")
+
+    def _draw_undo(self, c1, c2):
+        move = Line(c1._center(), c2._center())
+        self._win.draw_line(move, self._win.bg_color)
 

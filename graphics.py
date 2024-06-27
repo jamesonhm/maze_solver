@@ -24,6 +24,7 @@ class Window:
         self.__canvas = Canvas(self.__root, bg=bg_color, width=width, height=height)
         self.__canvas.pack(fill=BOTH, expand=1)
         self.__running = False
+        self.bg_color = bg_color
 
     def redraw(self):
         self.__root.update_idletasks()

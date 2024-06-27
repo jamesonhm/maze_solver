@@ -1,3 +1,4 @@
+import random
 import time
 
 from graphics import Point, Window
@@ -11,7 +12,8 @@ class Maze:
                  ncols: int, 
                  cell_size_x: int, 
                  cell_size_y: int, 
-                 win: Window):
+                 seed: int | None = None,
+                 win: Window | None = None):
         self._cells = []
         self.xpos = xpos
         self.ypos = ypos
@@ -19,8 +21,12 @@ class Maze:
         self.ncols = ncols
         self.cell_size_x = cell_size_x
         self.cell_size_y = cell_size_y
+        random.seed(seed)
         self._win = win 
         self._create_cells()
+        self._break_entrance_and_exit()
+        self._break_walls_r(0, 0)
+        self._reset_cells_visited()
 
     def _create_cells(self):
         for i in range(self.ncols):
@@ -49,6 +55,62 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        time.sleep(0.05)
+        time.sleep(0.1)
 
+    def _break_entrance_and_exit(self):
+        self._cells[0][0].has_top = False
+        self._draw_cell(0, 0)
+        self._cells[-1][-1].has_bottom = False
+        self._draw_cell(self.ncols-1, self.nrows-1)
+
+    def _break_walls_r(self, i, j):
+        self._cells[i][j].visited = True
+        while True:
+            to_visit = []
+            adjacent_cells = self._get_adjacent_cells(i, j)
+            for cell in adjacent_cells:
+                if not self._cells[cell[0]][cell[1]].visited:
+                    to_visit.append(cell)
+            if len(to_visit) == 0:
+                self._draw_cell(i, j)
+                return
+            next = random.choice(to_visit)
+            self._connect_cells((i, j), next)
+            self._break_walls_r(next[0], next[1])
+    
+    def _get_adjacent_cells(self, i, j):
+        possibles = [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
+        cells = [(c, r) for (c, r) in possibles if 0 <= c < self.ncols and 0 <= r < self.nrows]
+        return cells
+
+    def _connect_cells(self, c1, c2):
+        if c2[1] > c1[1]:
+            # c2 below c1
+            self._cells[c1[0]][c1[1]].has_bottom = False
+            self._draw_cell(c1[0], c1[1])
+            self._cells[c2[0]][c2[1]].has_top = False
+            self._draw_cell(c2[0], c2[1])
+        elif c2[1] < c1[1]:
+            #c2 above c1
+            self._cells[c1[0]][c1[1]].has_top = False
+            self._draw_cell(c1[0], c1[1])
+            self._cells[c2[0]][c2[1]].has_bottom = False
+            self._draw_cell(c2[0], c2[1])
+        if c2[0] > c1[0]:
+            # c2 right c1
+            self._cells[c1[0]][c1[1]].has_right = False
+            self._draw_cell(c1[0], c1[1])
+            self._cells[c2[0]][c2[1]].has_left = False
+            self._draw_cell(c2[0], c2[1])
+        elif c2[0] < c1[0]:
+            #c2 left c1
+            self._cells[c1[0]][c1[1]].has_left = False
+            self._draw_cell(c1[0], c1[1])
+            self._cells[c2[0]][c2[1]].has_right = False
+            self._draw_cell(c2[0], c2[1])
+
+    def _reset_cells_visited(self):
+        for col in self._cells:
+            for cell in col:
+                cell.visited = False
 
